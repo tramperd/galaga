@@ -6,8 +6,8 @@ class Projectile(pg.sprite.Sprite):
         super(Projectile, self).__init__()
         self.image = pg.image.load(os.path.join('assets', 'shot.png')).convert_alpha()
         self.rect = self.image.get_rect()
-        self.rect.centerx = shipLocation.x + 100
-        self.rect.centery = shipLocation.y + 37
+        self.rect.centerx = shipLocation.centerx  # Center projectile horizontally based on player
+        self.rect.centery = shipLocation.top  # Start the projectile just above the player's ship
         self.enemies = enemies
         self.event = pg.USEREVENT + 1
         self.fireSound = pg.mixer.Sound("fire.wav")
@@ -18,13 +18,13 @@ class Projectile(pg.sprite.Sprite):
         screen.blit(self.image, self.rect)
 
     def update(self, delta):
-        self.rect.x += 1000 * delta
-        if self.rect.x > 1024:
+        self.rect.x += 1000 * delta  # Move projectile rightwards
+        if self.rect.x > 1024:  # If the projectile goes off screen, remove it
             self.kill()
         collision = pg.sprite.spritecollideany(self, self.enemies)
         if collision:
-            collision.kill()
-            pg.event.post(pg.event.Event(self.event))
-            self.explosionSound.play()
-            self.kill()
+            collision.kill()  # Remove the enemy
+            pg.event.post(pg.event.Event(self.event))  # Trigger the event for score update
+            self.explosionSound.play()  # Play explosion sound
+            self.kill()  # Remove the projectile
 
